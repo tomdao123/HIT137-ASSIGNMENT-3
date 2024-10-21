@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog, simpledialog, messagebox, Scale
+from tkinter import filedialog, simpledialog, messagebox, Scale, HORIZONTAL
 from functools import wraps
 import cv2
 from PIL import Image, ImageTk
@@ -57,7 +57,7 @@ class MainApp(BaseApp):
         self.fullscreen_button = tk.Button(self.root, text="Fullscreen", command=self.toggle_fullscreen)
         self.fullscreen_button.pack()
 
-        self.volume_scale = Scale(self.root, from_=0, to=100, orient=tk.HORIZONTAL, label="Volume")
+        self.volume_scale = Scale(self.root, from_=0, to=100, orient=HORIZONTAL, label="Volume")
         self.volume_scale.pack()
         self.volume_scale.set(50)
 
@@ -70,6 +70,9 @@ class MainApp(BaseApp):
 
         self.progress_label = tk.Label(self.root, text="Progress: 0%")
         self.progress_label.pack()
+
+        self.progress_scale = Scale(self.root, from_=0, to=100, orient=HORIZONTAL, label="Video Progress", command=self.seek_video)
+        self.progress_scale.pack(fill=tk.X, padx=10)
 
     @log_decorator  # Decorator usage
     def load_video(self):
@@ -138,6 +141,21 @@ class MainApp(BaseApp):
             total_frames = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
             progress = (current_frame / total_frames) * 100 if total_frames else 0
             self.progress_label.config(text=f"Progress: {progress:.2f}%")
+            self.progress_scale.set(progress)
+
+    def seek_video(self, value):
+        if self.cap:
+            total_frames = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            frame_number = int((int(value) / 100) * total_frames)
+            self.cap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
+            if not self.is_playing:
+                ret, frame = self.cap.read()
+                if ret:
+                    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    image = Image.fromarray(frame)
+                    image_tk = ImageTk.PhotoImage(image=image)
+                    self.video_panel.config(image=image_tk)
+                    self.video_panel.image = image_tk
 
 # Multiple Inheritance Example
 class FileHandler:
@@ -155,3 +173,4 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = YoutubeApp(root)
     root.mainloop()
+
