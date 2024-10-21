@@ -49,15 +49,16 @@ grenade_thrown = False
 boss = None
 
 # loading music n sounds
-pygame.mixer.music.load(file_path + '')
-pygame.mixer.music.set_volume(0.2)
+pygame.mixer.music.load(file_path + 'audio/Background.wav')
+pygame.mixer.music.set_volume(0.3)
 pygame.mixer.music.play(-1, 0.0, 5000)
-jump_fx = pygame.mixer.Sound(file_path + '')
-jump_fx.set_volume(0.4)
-shot_fx = pygame.mixer.Sound(file_path + '')
-shot_fx.set_volume(0.4)
-grenade_fx = pygame.mixer.Sound(file_path + '')
-grenade_fx.set_volume(0.4)
+jump_fx = pygame.mixer.Sound(file_path + 'audio/Jumping.wav')
+jump_fx.set_volume(0.5)
+shot_fx = pygame.mixer.Sound(file_path + 'audio/Shooting.wav')
+shot_fx.set_volume(0.5)
+grenade_fx = pygame.mixer.Sound(file_path + 'audio/Exploding.wav')
+grenade_fx.set_volume(0.5)
+
 
 
 # loading images 
