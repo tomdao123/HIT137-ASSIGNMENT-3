@@ -79,13 +79,13 @@ for x in range(TILE_TYPES):
     image = pygame.transform.scale(image, (TILE_SIZE, TILE_SIZE))
     image_list.append(image)
 #bullet
-bullet_image = pygame.image.load(file_path + '').convert_alpha()
+bullet_img = pygame.image.load(file_path + 'img/icons/bullet.png').convert_alpha()
 #grenade
-grenade_image = pygame.image.load(file_path + '').convert_alpha()
+grenade_img = pygame.image.load(file_path + 'img/icons/grenade.png').convert_alpha()
 #pickup boxes 
-health_box_image = pygame.image.load(file_path + '').convert_alpha()
-ammo_box_image = pygame.image.load(file_path + '').convert_alpha()
-grenade_box_image = pygame.image.load(file_path + '').convert_alpha()
+health_box_img = pygame.image.load(file_path + 'img/icons/health_box.png').convert_alpha()
+ammo_box_img = pygame.image.load(file_path + 'img/icons/ammo_box.png').convert_alpha()
+grenade_box_img = pygame.image.load(file_path + 'img/icons/grenade_box.png').convert_alpha()
 item_boxes = {
     'Health'  : health_box_image, 
     'Ammo'    : ammo_box_image,
