@@ -61,16 +61,17 @@ grenade_fx.set_volume(0.5)
 
 
 
-# loading images 
-#button
-start_image = pygame.image.load(file_path + '').convert_alpha()
-restart_image = pygame.image.load(file_path + '').convert_alpha()
-exit_image = pygame.image.load(file_path + '').convert_alpha()
-#background
-sky_image = pygame.image.load(file_path + '').convert_alpha()
-mountain_image = pygame.image.load(file_path + '').convert_alpha()
-pine1_image = pygame.image.load(file_path + '').convert_alpha()
-pine2_image = pygame.image.load(file_path + '').convert_alpha()
+
+#load images 
+#button images
+start_img = pygame.image.load(file_path + 'img/start_btn.png').convert_alpha()
+exit_img = pygame.image.load(file_path + 'img/exit_btn.png').convert_alpha()
+restart_img = pygame.image.load(file_path + 'img/restart_btn.png').convert_alpha()
+#backgrounds
+pine1_img = pygame.image.load(file_path + 'img/Background/pine1.png').convert_alpha()
+pine2_img = pygame.image.load(file_path + 'img/Background/pine2.png').convert_alpha()
+mountain_img = pygame.image.load(file_path + 'img/Background/clouds.jpg').convert_alpha()
+sky_img = pygame.image.load(file_path + 'img/Background/sky_cloud.png').convert_alpha()
 #storing tiles in a list
 image_list = []
 for x in range(TILE_TYPES):
