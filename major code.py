@@ -113,26 +113,26 @@ def draw_text(text, font, color, x, y):
     # Render the provided text using the specified font and color, with anti-aliasing enabled for smoother edges
     text_image = font.render(text, True, color)
     # Place the rendered text on the screen at the given (x, y) coordinates
-    screen.blit(text_image, (x, y))
+    screenset.blit(text_image, (x, y))
 
 
 # Function to draw and manage the scrolling background layers
 def draw_bg():
     # First, fill the entire screen with the background color (BG)
-    screen.fill(BG)
+    screenset.fill(BG)
     # Get the width of the sky image to calculate how many times it needs to be repeated horizontally
     sky_layer_width = sky_img.get_width()
 
     # Loop through a range to draw multiple copies of background elements to create a scrolling effect
     for i in range(5):
         # Draw the sky image repeatedly, scrolling slowly at half the speed of the background scroll
-        screen.blit(sky_img, ((i * sky_layer_width) - bg_scroll * 0.5, 0))
+        screenset.blit(sky_img, ((i * sky_layer_width) - bg_scroll * 0.5, 0))
         # Draw the mountain layer slightly faster, positioned lower on the screen
-        screen.blit(mountain_img, ((i * sky_layer_width) - bg_scroll * 0.6, SCREEN_HEIGHT - mountain_img.get_height() - 300))
+        screenset.blit(mountain_img, ((i * sky_layer_width) - bg_scroll * 0.6, screenset_HEIGHT - mountain_img.get_height() - 300))
         # Draw the first pine tree layer, further down, with a quicker scroll speed
-        screen.blit(pine1_img, ((i * sky_layer_width) - bg_scroll * 0.7, SCREEN_HEIGHT - pine1_img.get_height() - 150))
+        screenset.blit(pine1_img, ((i * sky_layer_width) - bg_scroll * 0.7, screenset_HEIGHT - pine1_img.get_height() - 150))
         # Draw the second pine tree layer at the bottom of the screen, with the fastest scroll speed
-        screen.blit(pine2_img, ((i * sky_layer_width) - bg_scroll * 0.8, SCREEN_HEIGHT - pine2_img.get_height()))
+        screenset.blit(pine2_img, ((i * sky_layer_width) - bg_scroll * 0.8, screenset_HEIGHT - pine2_img.get_height()))
 
 
 
@@ -291,7 +291,7 @@ class PLAYER(pygame.sprite.Sprite):
             bullet = Bullet(self.rect.centerx + (0.75 * self.rect.size[0] * self.direction), self.rect.centery, self.direction)
             bullet_group.add(bullet)
             self.ammo -= 1
-            shot_fx.play()
+            shot_sound.play()
 
     def ai(self):
         """ enemy AI movement and shooting."""
@@ -497,7 +497,7 @@ class World():
         for y, row in enumerate(data):
             for x, tile in enumerate(row):
                 if tile >= 0:
-                    img = image_list[tile]
+                    img = img_list[tile]
                     img_rect = img.get_rect()
                     img_rect.x = x * TILE_SIZE
                     img_rect.y = y * TILE_SIZE
@@ -621,7 +621,7 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, direction):
         super().__init__()
         self.speed = 10 
-        self.image = bullet_image
+        self.image = bullet_img
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.direction = direction 
@@ -654,7 +654,7 @@ class Grenade(pygame.sprite.Sprite):
         self.timer = 100
         self.vel_y = -15
         self.speed = 7 
-        self.image = grenade_image
+        self.image = grenade_img
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.width = self.image.get_width()
@@ -690,7 +690,7 @@ class Grenade(pygame.sprite.Sprite):
         self.timer -= 1
         if self.timer <= 0:
             self.kill()
-            grenade_fx.play()
+            grenade_sound.play()
             explosion = Explosion(self.rect.x, self.rect.y, 0.5)
             explosion_group.add(explosion)
             #damaging anyone nearby
@@ -796,7 +796,7 @@ def game_over_screenset():
     """displays the game over screen"""
     screenset.fill(BG)
     display_score()
-    restart_button = button.Button(screenset_WIDTH // 2 - 50, screenset_HEIGHT // 2 + 70, restart_image, 1)
+    restart_button = button.Button(screenset_WIDTH // 2 - 50, screenset_HEIGHT // 2 + 70, restart_img, 1)
     waiting = True
     while waiting:
         for event in pygame.event.get():
@@ -820,9 +820,9 @@ intro_fade = screensetFade(1, WHITE, 4)
 death_fade = screensetFade(2, RED, 4)
 
 #buttons
-start_button = button.Button(screenset_WIDTH // 2 - 130, screenset_HEIGHT // 2 - 150, start_image, 1)
-exit_button = button.Button(screenset_WIDTH // 2 - 110, screenset_HEIGHT // 2 + 50, exit_image, 1)
-restart_button = button.Button(screenset_WIDTH // 2 - 100, screenset_HEIGHT // 2 - 50, restart_image, 2)
+start_button = button.Button(screenset_WIDTH // 2 - 130, screenset_HEIGHT // 2 - 150, start_img, 1)
+exit_button = button.Button(screenset_WIDTH // 2 - 110, screenset_HEIGHT // 2 + 50, exit_img, 1)
+restart_button = button.Button(screenset_WIDTH // 2 - 100, screenset_HEIGHT // 2 - 50, restart_img, 2)
 
 #sprite groups
 enemy_group = pygame.sprite.Group()
@@ -871,11 +871,11 @@ while run:
         #shows the amount of ammo
         draw_text('AMMO: ', font, WHITE, 10, 35)
         for x in range(player.ammo):
-            screenset.blit(bullet_image, (90 + (x * 10), 40))
+            screenset.blit(bullet_img, (90 + (x * 10), 40))
         #shows the ammount of grenade
         draw_text('GRENADE: ', font, WHITE, 10, 60)
         for x in range(player.grenades):
-            screenset.blit(grenade_image, (135 + (x * 15), 60))
+            screenset.blit(grenade_img, (135 + (x * 15), 60))
 
 
         player.update()
@@ -976,7 +976,7 @@ while run:
                 grenade = True
             if event.key == pygame.K_UP and player.alive:
                 player.jump = True
-                jump_fx.play()
+                jump_sound.play()
             if event.key == pygame.K_ESCAPE:
                 run = False
 
