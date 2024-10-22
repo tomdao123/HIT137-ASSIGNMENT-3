@@ -47,52 +47,57 @@ shoot = False
 grenade = False
 grenade_thrown = False
 boss = None
-
-# loading music n sounds
+#load music/sounds
 pygame.mixer.music.load(file_path + 'audio/Background.wav')
-pygame.mixer.music.set_volume(0.3)
-pygame.mixer.music.play(-1, 0.0, 5000)
-jump_fx = pygame.mixer.Sound(file_path + 'audio/Jumping.wav')
-jump_fx.set_volume(0.5)
-shot_fx = pygame.mixer.Sound(file_path + 'audio/Shooting.wav')
-shot_fx.set_volume(0.5)
-grenade_fx = pygame.mixer.Sound(file_path + 'audio/Exploding.wav')
-grenade_fx.set_volume(0.5)
+pygame.mixer.music.set_volume(0.3)  # Set the background music volume to 30%
+pygame.mixer.music.play(loops=-1, start=0.0, fade_ms=5000)  # Loop the music indefinitely with a 5-second fade-in
 
+# Load and adjust the volume for various sound effects
+jump_sound = pygame.mixer.Sound(file_path + 'audio/Jumping.wav')
+jump_sound.set_volume(0.5)  # Set jump sound effect volume to 50%
 
+shot_sound = pygame.mixer.Sound(file_path + 'audio/Shooting.wav')
+shot_sound.set_volume(0.5)  # Set shooting sound effect volume to 50%
 
+grenade_sound = pygame.mixer.Sound(file_path + 'audio/Exploding.wav')
+grenade_sound.set_volume(0.5)  # Set explosion sound effect volume to 50%
 
 #load images 
 #button images
+# Load button images and convert them with alpha transparency
 start_img = pygame.image.load(file_path + 'img/start_btn.png').convert_alpha()
 exit_img = pygame.image.load(file_path + 'img/exit_btn.png').convert_alpha()
 restart_img = pygame.image.load(file_path + 'img/restart_btn.png').convert_alpha()
-#backgrounds
+
+# Load background images with alpha transparency
+cloud_img = pygame.image.load(file_path + 'img/Background/clouds.jpg').convert_alpha()
 pine1_img = pygame.image.load(file_path + 'img/Background/pine1.png').convert_alpha()
 pine2_img = pygame.image.load(file_path + 'img/Background/pine2.png').convert_alpha()
-mountain_img = pygame.image.load(file_path + 'img/Background/clouds.jpg').convert_alpha()
-sky_img = pygame.image.load(file_path + 'img/Background/sky_cloud.png').convert_alpha()
-#storing tiles in a list
-image_list = []
-for x in range(TILE_TYPES):
-    image = pygame.image.load(file_path + f'img/Tile/{x}.png')
-    image = pygame.transform.scale(image, (TILE_SIZE, TILE_SIZE))
-    image_list.append(image)
-#bullet
-bullet_img = pygame.image.load(file_path + 'img/icons/bullet.png').convert_alpha()
-#grenade
-grenade_img = pygame.image.load(file_path + 'img/icons/grenade.png').convert_alpha()
-#pickup boxes 
-health_box_img = pygame.image.load(file_path + 'img/icons/health_box.png').convert_alpha()
-ammo_box_img = pygame.image.load(file_path + 'img/icons/ammo_box.png').convert_alpha()
-grenade_box_img = pygame.image.load(file_path + 'img/icons/grenade_box.png').convert_alpha()
-item_boxes = {
-    'Health'  : health_box_image, 
-    'Ammo'    : ammo_box_image,
-    'Grenade' : grenade_box_image
-}
 
-#defining colours
+mountain_img = pygame.image.load(file_path + 'img/Background/mountain.png').convert_alpha()
+sky_img = pygame.image.load(file_path + 'img/Background/sky_cloud.png').convert_alpha()
+img_list = []
+for tile_index in range(TILE_TYPES):
+    tile_img = pygame.image.load(f'{file_path}img/Tile/{tile_index}.png')  # Load each tile image
+    tile_img = pygame.transform.scale(tile_img, (TILE_SIZE, TILE_SIZE))    # Resize to the specified size
+    img_list.append(tile_img)  # Add each scaled tile to the list
+
+# Load icons with transparency
+bullet_img = pygame.image.load(f'{file_path}img/icons/bullet.png').convert_alpha()
+grenade_img = pygame.image.load(f'{file_path}img/icons/grenade.png').convert_alpha()
+
+# Load and assign pickup box images
+health_box_img = pygame.image.load(f'{file_path}img/icons/health_box.png').convert_alpha()
+ammo_box_img = pygame.image.load(f'{file_path}img/icons/ammo_box.png').convert_alpha()
+grenade_box_img = pygame.image.load(f'{file_path}img/icons/grenade_box.png').convert_alpha()
+
+# Store the pickup box images in a dictionary for easy reference
+item_boxes = {
+    'Health': health_box_img,
+    'Ammo': ammo_box_img,
+    'Grenade': grenade_box_img
+}
+#define colours
 BG = (144, 201, 120)
 RED = (255, 0, 0)
 WHITE = (255, 255, 255)
@@ -100,27 +105,38 @@ GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 PINK = (235, 65, 54)
 
-#defining font
-font = pygame.font.SysFont('Almendra', 30)
+#define font
+font = pygame.font.SysFont('Futura', 30)
 
-def draw_text(text, font, text_col, x, y):
-    """rendering and drawing text on the screen"""
-    image = font.render(text, True, text_col)
-    screenset.blit(image, (x, y))
+# Function to render and display text on the screen
+def draw_text(text, font, color, x, y):
+    # Render the provided text using the specified font and color, with anti-aliasing enabled for smoother edges
+    text_image = font.render(text, True, color)
+    # Place the rendered text on the screen at the given (x, y) coordinates
+    screen.blit(text_image, (x, y))
 
 
+# Function to draw and manage the scrolling background layers
 def draw_bg():
-    """drawing the background images"""
-    screenset.fill(BG)
-    width = sky_image.get_width()
-    for x in range(5):     
-        screenset.blit(sky_image, ((x * width) - bg_scroll * 0.5, 0))
-        screenset.blit(mountain_image, ((x * width) - bg_scroll * 0.6, screenset_HEIGHT - mountain_image.get_height() - 300))
-        screenset.blit(pine1_image, ((x * width) - bg_scroll * 0.7, screenset_HEIGHT - pine1_image.get_height() - 150))
-        screenset.blit(pine2_image, ((x * width) - bg_scroll *0.8, screenset_HEIGHT - pine2_image.get_height()))
+    # First, fill the entire screen with the background color (BG)
+    screen.fill(BG)
+    # Get the width of the sky image to calculate how many times it needs to be repeated horizontally
+    sky_layer_width = sky_img.get_width()
+
+    # Loop through a range to draw multiple copies of background elements to create a scrolling effect
+    for i in range(5):
+        # Draw the sky image repeatedly, scrolling slowly at half the speed of the background scroll
+        screen.blit(sky_img, ((i * sky_layer_width) - bg_scroll * 0.5, 0))
+        # Draw the mountain layer slightly faster, positioned lower on the screen
+        screen.blit(mountain_img, ((i * sky_layer_width) - bg_scroll * 0.6, SCREEN_HEIGHT - mountain_img.get_height() - 300))
+        # Draw the first pine tree layer, further down, with a quicker scroll speed
+        screen.blit(pine1_img, ((i * sky_layer_width) - bg_scroll * 0.7, SCREEN_HEIGHT - pine1_img.get_height() - 150))
+        # Draw the second pine tree layer at the bottom of the screen, with the fastest scroll speed
+        screen.blit(pine2_img, ((i * sky_layer_width) - bg_scroll * 0.8, SCREEN_HEIGHT - pine2_img.get_height()))
 
 
-#function for resetting the level
+
+
 def reset_level():
     enemy_group.empty()
     bullet_group.empty()
