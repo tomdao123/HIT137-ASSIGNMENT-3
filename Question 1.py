@@ -18,7 +18,7 @@ def log_decorator(func):
 class BaseApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Youtube Like Interface Application")
+        self.root.title("Crappideo Application")
         self.setup_ui()
 
     def setup_ui(self):
@@ -32,11 +32,12 @@ class MainApp(BaseApp):
         self.cap = None
         self.is_playing = False
         self.play_thread = None
+        self.pause_flag = threading.Event()
         super().__init__(root)
 
     # Overriding Base Class Method
     def setup_ui(self):
-        self.label = tk.Label(self.root, text="Welcome to the Youtube Like Interface Application")
+        self.label = tk.Label(self.root, text="Welcome to Crappideo Application")
         self.label.pack()
 
         self.load_button = tk.Button(self.root, text="Load Video", command=self.load_video)
@@ -84,10 +85,14 @@ class MainApp(BaseApp):
 
     @log_decorator  # Decorator usage
     def play_video(self):
-        if self.__video_loaded and not self.is_playing:
-            self.is_playing = True
-            self.play_thread = threading.Thread(target=self.play_video_thread)
-            self.play_thread.start()
+        if self.__video_loaded:
+            if not self.is_playing:
+                self.is_playing = True
+                self.pause_flag.clear()
+                self.play_thread = threading.Thread(target=self.play_video_thread)
+                self.play_thread.start()
+            else:
+                self.pause_flag.clear()
         elif not self.__video_loaded:
             self.label.config(text="Please load a video first.")
 
@@ -95,6 +100,8 @@ class MainApp(BaseApp):
         fps = self.cap.get(cv2.CAP_PROP_FPS)
         delay = 1 / fps if fps > 0 else 0.03
         while self.cap.isOpened() and self.is_playing:
+            if self.pause_flag.is_set():
+                continue
             start_time = time.time()
             ret, frame = self.cap.read()
             if not ret:
@@ -114,6 +121,7 @@ class MainApp(BaseApp):
     def pause_video(self):
         if self.__video_loaded:
             self.is_playing = False
+            self.pause_flag.set()
             self.label.config(text="Video is paused.")
         else:
             self.label.config(text="Please load a video first.")
@@ -156,6 +164,16 @@ class MainApp(BaseApp):
                     image_tk = ImageTk.PhotoImage(image=image)
                     self.video_panel.config(image=image_tk)
                     self.video_panel.image = image_tk
+            else:
+                self.pause_flag.set()  # Pause the thread before seeking
+                ret, frame = self.cap.read()
+                if ret:
+                    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    image = Image.fromarray(frame)
+                    image_tk = ImageTk.PhotoImage(image=image)
+                    self.video_panel.config(image=image_tk)
+                    self.video_panel.image = image_tk
+                self.pause_flag.clear()  # Resume the thread after seeking
 
 # Multiple Inheritance Example
 class FileHandler:
@@ -163,7 +181,7 @@ class FileHandler:
         file_path = filedialog.askopenfilename()
         print(f"File selected: {file_path}")
 
-class YoutubeApp(MainApp, FileHandler):
+class CrappideoApp(MainApp, FileHandler):
     def __init__(self, root):
         super().__init__(root)
         self.file_button = tk.Button(self.root, text="Open File", command=self.open_file)
@@ -171,6 +189,5 @@ class YoutubeApp(MainApp, FileHandler):
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = YoutubeApp(root)
+    app = CrappideoApp(root)
     root.mainloop()
-
