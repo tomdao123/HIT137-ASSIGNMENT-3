@@ -186,17 +186,27 @@ class PLAYER(pygame.sprite.Sprite):
         self.width = self.image.get_width()
         self.height = self.image.get_height()
 
-    def load_animations(self, char_type, scale):
-        """loading animation images for the player"""
-        animation_types = ['Idle', 'Run', 'Jump', 'Death']
-        for animation in animation_types:
-            temp_list = []
-            num_of_frames = len(os.listdir(file_path + f'img/{char_type}/{animation}'))
-            for i in range(num_of_frames):
-                img = pygame.image.load(file_path + f'img/{char_type}/{animation}/{i}.png').convert_alpha()
-                img = pygame.transform.scale(img, (int(img.get_width() * scale), int(img.get_height() * scale)))
-                temp_list.append(img)
-            self.animation_list.append(temp_list)
+  def load_animations(self, character_type, scale_factor):
+    """Loads the animation images for the player character."""
+    # List of animation states to be loaded (e.g., Idle, Running, Jumping, Dying)
+    animation_states = ['Idle', 'Run', 'Jump', 'Death']
+    
+    # Iterate through each animation state
+    for state in animation_states:
+        frame_list = []  # Temporary list to store all frames for the current animation
+        # Get the number of frames by counting the images in the animation folder
+        total_frames = len(os.listdir(f'{file_path}img/{character_type}/{state}'))
+        
+        # Load each frame of the current animation
+        for frame in range(total_frames):
+            # Load the image file for the current frame, ensuring it supports transparency (alpha channel)
+            img = pygame.image.load(f'{file_path}img/{character_type}/{state}/{frame}.png').convert_alpha()
+            # Resize the image according to the given scale factor
+            img = pygame.transform.scale(img, (int(img.get_width() * scale_factor), int(img.get_height() * scale_factor)))
+            frame_list.append(img)  # Add the processed frame to the temporary list
+        
+        # Append the full list of frames for this animation state to the player's animation list
+        self.animation_list.append(frame_list)
 
     def update(self):
         """updates player state and check for cooldowns"""
