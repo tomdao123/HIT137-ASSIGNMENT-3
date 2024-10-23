@@ -178,15 +178,8 @@ class PLAYER(pygame.sprite.Sprite):
         self.idling = False
         self.idling_counter = 0 
         
-        # loads all images for player animations
-        self.load_animations(char_type, scale)
-
-        self.image = self.animation_list[self.action][self.frame_index]
-        self.rect = self.image.get_rect(center=(x, y))
-        self.width = self.image.get_width()
-        self.height = self.image.get_height()
-
-         animation_types = ['Idle', 'Run', 'Jump', 'Death']
+        #load all images for players 
+        animation_types = ['Idle', 'Run', 'Jump', 'Death']
         for animation in animation_types:
             #reset temp list of images
             temp_list = []
