@@ -53,7 +53,7 @@ pygame.mixer.music.set_volume(0.3)  # Set the background music volume to 30%
 pygame.mixer.music.play(loops=-1, start=0.0, fade_ms=5000)  # Loop the music indefinitely with a 5-second fade-in
 
 # Load and adjust the volume for various sound effects
-jump_sound = pygame.mixer.Sound(file_path + 'audio/Jumping.wav')
+jump_sound = pygame.mixer.Sound(file_path + 'audio/Exploding.wav')
 jump_sound.set_volume(0.5)  # Set jump sound effect volume to 50%
 
 shot_sound = pygame.mixer.Sound(file_path + 'audio/Shooting.wav')
@@ -77,6 +77,8 @@ pine2_img = pygame.image.load(file_path + 'img/Background/pine2.png').convert_al
 mountain_img = pygame.image.load(file_path + 'img/Background/mountain.png').convert_alpha()
 sky_img = pygame.image.load(file_path + 'img/Background/sky_cloud.png').convert_alpha()
 img_list = []
+
+
 for tile_index in range(TILE_TYPES):
     tile_img = pygame.image.load(f'{file_path}img/Tile/{tile_index}.png')  # Load each tile image
     tile_img = pygame.transform.scale(tile_img, (TILE_SIZE, TILE_SIZE))    # Resize to the specified size
