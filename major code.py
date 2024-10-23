@@ -215,52 +215,57 @@ class PLAYER(pygame.sprite.Sprite):
         if self.shoot_cooldown > 0:
             self.shoot_cooldown -= 1
 
-    def move(self, moving_left, moving_right):
-        """resets movement variables and collisions""" 
-        screenset_scroll = 0
-        dx = 0 
-        dy = 0 
+    def move(self, move_left, move_right):
+    """Manages the player’s movement and detects collisions with obstacles."""
+    
+    # Initialize variables for movement and screen scrolling
+    screen_scroll = 0  # Tracks screen scrolling (if applicable)
+    dx = 0  # Horizontal distance to move
+    dy = 0  # Vertical distance to move
 
-        #assigns movement variables when moving left or right
-        if moving_left:
-            dx = -self.speed
-            self.flip = True
-            self.direction = -1
-        if moving_right:
-            dx = self.speed
-            self.flip = False
-            self.direction = 1 
- 
-        if self.jump and not self.in_air:
-            self.vel_y = -15
-            self.jump = False
-            self.in_air = True
+    # Determine movement direction based on player input
+    if move_left:  # If the player is moving left
+        dx = -self.speed  # Move left by subtracting the speed from the x-coordinate
+        self.flip = True  # Flip the character sprite to face left
+        self.direction = -1  # Set direction indicator to left (-1)
+    if move_right:  # If the player is moving right
+        dx = self.speed  # Move right by adding the speed to the x-coordinate
+        self.flip = False  # Keep the sprite facing right
+        self.direction = 1  # Set direction indicator to right (1)
 
-        #apply gravity
-        self.vel_y += GRAVITY
-        dy += min(self.vel_y, 10) 
+    # Handle jumping: If the player presses jump and is on the ground
+    if self.jump and not self.in_air:
+        self.vel_y = -15  # Apply a negative vertical velocity to simulate jumping
+        self.jump = False  # Reset the jump flag so the player can't jump again mid-air
+        self.in_air = True  # Mark the player as airborne
 
-        #checking for collision 
-        for tile in world.obstacle_list:
-            #in the x direction
-            if tile [1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
-                dx = 0 
-                #if AI hit a wall then it will turn around
-                if self.char_type == 'enemy':
-                    self.direction *= -1
-                    self.move_counter = 0 
+    # Apply gravity: Increase the vertical velocity to simulate the effect of gravity
+    self.vel_y += GRAVITY  # Continuously increase the downward velocity (falling)
+    dy += min(self.vel_y, 10)  # Apply the falling movement with a maximum speed limit
 
-            #in the y direction
-            if tile [1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
-                #checking if below the ground (jumping)
-                if self.vel_y < 0:
-                    self.vel_y = 0 
-                    dy = tile[1].bottom - self.rect.top
-                #checking if above the ground (falling)
-                elif self.vel_y >= 0:
-                    self.vel_y = 0
-                    self.in_air = False
-                    dy = tile[1].top - self.rect.bottom
+    # Check for collisions with obstacles in the game world
+    for obstacle in world.obstacle_list:
+        # Check for horizontal collisions (moving left or right)
+        if obstacle[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
+            dx = 0  # Stop horizontal movement if there’s a collision
+            # If the character is an enemy, reverse its direction upon hitting a wall
+            if self.char_type == 'enemy':
+                self.direction *= -1  # Invert the direction
+                self.move_counter = 0  # Reset the movement counter for the AI
+
+        # Check for vertical collisions (jumping or falling)
+        if obstacle[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+            # If jumping and colliding with an object above
+            if self.vel_y < 0:
+                self.vel_y = 0  # Stop upward movement upon collision
+                dy = obstacle[1].bottom - self.rect.top  # Adjust position to stop at the obstacle's bottom
+            # If falling and colliding with the ground or another object below
+            elif self.vel_y >= 0:
+                self.vel_y = 0  # Stop downward movement upon landing
+                self.in_air = False  # Mark the player as back on the ground
+                dy = obstacle[1].top - self.rect.bottom  # Adjust position to rest on top of the obstacle
+
+      
 
 
         #collision with water
