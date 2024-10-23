@@ -212,12 +212,12 @@ class PLAYER(pygame.sprite.Sprite):
             self.shoot_cooldown -= 1
 
     def move(self, moving_left, moving_right):
-        #reset movement variables 
-        screen_scroll = 0
+        """resets movement variables and collisions""" 
+        screenset_scroll = 0
         dx = 0 
         dy = 0 
 
-        #assign movement variables if moving left or right
+        #assigns movement variables when moving left or right
         if moving_left:
             dx = -self.speed
             self.flip = True
@@ -226,9 +226,8 @@ class PLAYER(pygame.sprite.Sprite):
             dx = self.speed
             self.flip = False
             self.direction = 1 
-
-        #jump 
-        if self.jump == True and self.in_air == False:
+ 
+        if self.jump and not self.in_air:
             self.vel_y = -15
             self.jump = False
             self.in_air = True
@@ -237,38 +236,31 @@ class PLAYER(pygame.sprite.Sprite):
         self.vel_y += GRAVITY
         if self.vel_y > 10:
             self.vel_y
-        dy += self.vel_y
+        dy += self.vel_y 
 
-        #check for collision 
+        #checking for collision 
         for tile in world.obstacle_list:
-            #check collisions in the x direction
+            #in the x direction
             if tile [1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
                 dx = 0 
-                #if the AI has hit a wall then make it turn around
+                #if AI hit a wall then it will turn around
                 if self.char_type == 'enemy':
                     self.direction *= -1
                     self.move_counter = 0 
 
-            #check for collision in the y direction
+            #in the y direction
             if tile [1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
-                #check if below the ground, i.e jumping
+                #checking if below the ground (jumping)
                 if self.vel_y < 0:
                     self.vel_y = 0 
                     dy = tile[1].bottom - self.rect.top
-                #check if above the groun, i.e falling 
+                #checking if above the ground (falling)
                 elif self.vel_y >= 0:
                     self.vel_y = 0
                     self.in_air = False
                     dy = tile[1].top - self.rect.bottom
 
-
-       
-                   
-
-      
-
-
-        #collision with water
+         #collision with water
         if pygame.sprite.spritecollide(self, water_group, False):
             self.health = 0 
 
