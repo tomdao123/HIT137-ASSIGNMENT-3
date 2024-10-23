@@ -186,35 +186,38 @@ class PLAYER(pygame.sprite.Sprite):
         self.width = self.image.get_width()
         self.height = self.image.get_height()
 
-  def load_animations(self, character_type, scale_factor):
-    """Loads the animation images for the player character."""
-    # List of animation states to be loaded (e.g., Idle, Running, Jumping, Dying)
-    animation_states = ['Idle', 'Run', 'Jump', 'Death']
-    
-    # Iterate through each animation state
-    for state in animation_states:
-        frame_list = []  # Temporary list to store all frames for the current animation
-        # Get the number of frames by counting the images in the animation folder
-        total_frames = len(os.listdir(f'{file_path}img/{character_type}/{state}'))
-        
-        # Load each frame of the current animation
-        for frame in range(total_frames):
-            # Load the image file for the current frame, ensuring it supports transparency (alpha channel)
-            img = pygame.image.load(f'{file_path}img/{character_type}/{state}/{frame}.png').convert_alpha()
-            # Resize the image according to the given scale factor
-            img = pygame.transform.scale(img, (int(img.get_width() * scale_factor), int(img.get_height() * scale_factor)))
-            frame_list.append(img)  # Add the processed frame to the temporary list
-        
-        # Append the full list of frames for this animation state to the player's animation list
-        self.animation_list.append(frame_list)
+         animation_types = ['Idle', 'Run', 'Jump', 'Death']
+        for animation in animation_types:
+            #reset temp list of images
+            temp_list = []
+            #count number of files in the folder
+            num_of_frames = len(os.listdir(file_path + f'img/{self.char_type}/{animation}'))
+            for i in range(num_of_frames):
+                img = pygame.image.load(file_path + f'img/{self.char_type}/{animation}/{i}.png').convert_alpha()
+                img = pygame.transform.scale(img, (int(img.get_width() * scale), int(img.get_height() * scale)))
+                temp_list.append(img)            
+            self.animation_list.append(temp_list) 
 
-   def move(self, moving_left, moving_right):
-        """resets movement variables and collisions""" 
-        screenset_scroll = 0
+        self.image = self.animation_list[self.action][self.frame_index]
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
+
+    def update(self):
+        self.update_animation()
+        self.check_alive()
+        #update cooldown
+        if self.shoot_cooldown > 0:
+            self.shoot_cooldown -= 1
+
+    def move(self, moving_left, moving_right):
+        #reset movement variables 
+        screen_scroll = 0
         dx = 0 
         dy = 0 
 
-        #assigns movement variables when moving left or right
+        #assign movement variables if moving left or right
         if moving_left:
             dx = -self.speed
             self.flip = True
@@ -223,39 +226,44 @@ class PLAYER(pygame.sprite.Sprite):
             dx = self.speed
             self.flip = False
             self.direction = 1 
- 
-        if self.jump and not self.in_air:
+
+        #jump 
+        if self.jump == True and self.in_air == False:
             self.vel_y = -15
             self.jump = False
             self.in_air = True
 
         #apply gravity
         self.vel_y += GRAVITY
-        dy += min(self.vel_y, 10) 
+        if self.vel_y > 10:
+            self.vel_y
+        dy += self.vel_y
 
-        #checking for collision 
+        #check for collision 
         for tile in world.obstacle_list:
-            #in the x direction
+            #check collisions in the x direction
             if tile [1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
                 dx = 0 
-                #if AI hit a wall then it will turn around
+                #if the AI has hit a wall then make it turn around
                 if self.char_type == 'enemy':
                     self.direction *= -1
                     self.move_counter = 0 
 
-            #in the y direction
+            #check for collision in the y direction
             if tile [1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
-                #checking if below the ground (jumping)
+                #check if below the ground, i.e jumping
                 if self.vel_y < 0:
                     self.vel_y = 0 
                     dy = tile[1].bottom - self.rect.top
-                #checking if above the ground (falling)
+                #check if above the groun, i.e falling 
                 elif self.vel_y >= 0:
                     self.vel_y = 0
                     self.in_air = False
-                    dy = tile[1].top - self.rect.bottom 
-   
-        
+                    dy = tile[1].top - self.rect.bottom
+
+
+       
+                   
 
       
 
